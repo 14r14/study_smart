@@ -1,21 +1,19 @@
-from google.adk.agents import LlmAgent, SequentialAgent
+from google.adk.agents import LlmAgent, Agent
 from google.adk.tools import FunctionTool
 
 
-def get_user_preferences_input() -> str:
-    # This function will be used to get user preferences for study goals, subjects of interest, and available time.
-    # It will prompt the user for their study goals, subjects of interest, and available time for studying.
-    # The user may also provide additional information such as their preferred study methods (e.g., reading, practice problems, group study) and any specific resources they would like to use (e.g., textbooks, online courses).
-    # The function will return the user's preferences in a structured format.
-    # For example, it could return a dictionary with keys for study goals, subjects, available time, preferred methods, and specific resources.
-    # This is a placeholder implementation and should be replaced with actual logic to get user input.
-    return {
-        "study_goals": "Improve math skills",
-        "subjects": ["Math", "Science"],
-        "available_time": "2 hours per day",
-        "preferred_methods": ["Reading", "Practice problems"],
-        "specific_resources": ["Khan Academy", "Coursera"]
-    }
+async def get_user_preferences_input() -> str:
+    """
+    Function to get user preferences for study goals, subjects of interest, available time, and preferred resource types.
+    This function will prompt the user for their study goals, subjects of interest, and available time for studying.
+    The user may also provide additional information such as their preferred study methods (e.g., reading, practice problems, group study) and any specific resources they would like to use (e.g., textbooks, online courses).
+    The function will return the user's preferences as a string.
+
+    :return: User preferences as a string.
+    :rtype: str
+    """
+    preferences = str(input())
+    return preferences
 
 
 MODEL = "gemini-2.0-flash"
@@ -26,7 +24,7 @@ get_user_preferences = LlmAgent(
     instruction="You are a study assistant. Your task is to ask the user about their study goals, subjects of interest, and available time for studying. "
                 "Please ask the user for their study goals, subjects of interest, and available time before generating the plan."
                 "The user may also provide additional information such as their preferred study methods (e.g., reading, practice problems, group study) and any specific resources they would like to use (e.g., textbooks, online courses)."
-                "Use the get_user_preferences function to collect this information."
+                "Use the get_user_preferences tool to collect this information."
                 "Once you have the user's preferences, store them in the state key 'user_preferences' in a structured format.",
     output_key="user_preferences",
     model=MODEL,
@@ -65,42 +63,38 @@ resource_recommender = LlmAgent(
     model=MODEL,
 )
 
-output_aggregator = LlmAgent(
-    name="output_aggregator",
-    description="Aggregates the outputs of the study plan generator and resource recommender.",
-    instruction="""You are an output aggregator. Your task is to combine the outputs of the study plan generator and resource recommender into a cohesive study plan. 
-                    You will receive the study plan and recommended resources as input, and you should organize them in a clear and structured format.
-                    Make sure to highlight the key components of the study plan, including the goals, timeline, and recommended resources.
-                    Your response should be easy to read and understand, with a focus on helping the user stay organized and motivated in their studies.
-                    Use the study plan in state key 'study_plan' and resources in state key 'resources' to generate the final output.""",
+further_assistance = LlmAgent(
+    name="further_assistance",
+    description="Provides further assistance to the user if they have more questions or need additional resources.",
+    instruction="If the user has more questions or needs further assistance, provide them with the necessary information or resources using the appropriate tools. "
+                "If the user has no more questions, use the farewell tool to thank them for using the study assistant and wish them success in their studies.",
+    output_key="further_assistance",
     model=MODEL,
 )
 
-root_agent = SequentialAgent(
+farewell_exit = LlmAgent(
+    name="farewell",
+    description="A farewell message to the user.",
+    instruction="Thank the user for using the study assistant and wish them success in their studies.",
+    model=MODEL,
+)
+
+root_agent = Agent(
     name="study_smart",
     description="A comprehensive study assistant that helps users create personalized study plans and recommends resources.",
+    instruction="You are an expert study assistant. Your task is to help users create personalized study plans and recommend resources based on their goals and preferences. "
+                "You will use the get_user_preferences tool to collect information about the user's study goals, subjects of interest, and available time. "
+                "You will generate a personalized study plan using the study_plan_generator tool. "
+                "Once the study plan is generated, you will provide the user with a detailed outline of their study plan, including specific topics to cover, recommended resources, and a timeline for completion. "
+                "If the user would like specific resources, you will recommend study resources using the resource_recommender tool. "
+                "Ask the user if they have any more questions or if they need further assistance using the further_assistance tool. "
+                "If they do, provide them with the necessary information or resources using the appropriate tools. "
+                "If the user has no more questions, use the farewell_exit tool to thank them for using the study assistant and wish them success in their studies.",
     sub_agents=[
         get_user_preferences,
         study_plan_generator,
+        further_assistance,
         resource_recommender,
-        output_aggregator,]
+        farewell_exit,],
+    model=MODEL,
 )
-
-# The agent is designed to help users study effectively by providing personalized study plans, resources, and tips.
-# It includes various tools to assist with different aspects of studying, such as time management, motivation, and resource recommendations.
-# The agent is named "StudySmart" and has a description that outlines its purpose and the subjects it can assist with.
-# The tools included in the agent are:
-# 1. study_plan_generator: Generates a personalized study plan based on the user's goals and available time.
-# 2. resource_recommender: Recommends study resources such as books, articles, and videos based on the user's interests.
-# 3. study_tips_provider: Provides tips and techniques for effective studying and retention.
-# 4. progress_tracker: Tracks the user's progress and provides feedback on their study habits.
-# 5. motivation_booster: Sends motivational quotes and reminders to keep the user engaged.
-# 6. study_group_connector: Connects the user with study groups or partners for collaborative learning.
-# 7. time_management_tool: Helps the user manage their study time effectively with timers and schedules.
-# 8. quiz_generator: Creates quizzes and practice tests based on the user's study material.
-# 9. flashcard_creator: Generates flashcards for quick review of key concepts and terms.
-# 10. note_organizer: Organizes and categorizes the user's notes for easy access and review.
-# 11. feedback_collector: Collects feedback on the user's study methods and suggests improvements.
-# 12. study_environment_optimizer: Suggests ways to optimize the user's study environment for better focus.
-# 13. goal_setting_assistant: Assists the user in setting realistic and achievable study goals.
-# The agent is designed to be a comprehensive study assistant, providing a wide range of tools to help users improve their study habits and achieve their academic goals.
