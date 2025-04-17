@@ -3,7 +3,7 @@
 > **Note:** This project is still under development and is not fully ready yet. Features and documentation may change as development progresses.
 
 3.  **Install dependencies:**
-    The Agent Development Kit typically manages dependencies within its framework. Ensure you have followed the setup instructions for the Kit itself. If your agent has specific Python dependencies, list them in a `requirements.txt` file.
+    Use the commands listed below to setup the environment.
     ```bash
     python3 -m venv venv
     source venv/bin/activate
@@ -12,7 +12,7 @@
     ```
 
 4.  **Configuration:**
-    *   Make sure to configure the Environment variables or configuration files as required by the Agent Development Kit and your agent.
+    *   Make sure to configure the Environment variables in a ```.env``` file.
     *   This includes the following API Keys in .env
     ```bash
     GOOGLE_GENAI_USE_VERTEXAI=FALSE
