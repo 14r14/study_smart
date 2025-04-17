@@ -1,6 +1,6 @@
 # Study Smart Agent
 
-> **Note:** This project is still under development and is not fully ready for production use. Features and documentation may change as development progresses.
+> **Note:** This project is still under development and is not fully ready yet. Features and documentation may change as development progresses.
 
 3.  **Install dependencies:**
     The Agent Development Kit typically manages dependencies within its framework. Ensure you have followed the setup instructions for the Kit itself. If your agent has specific Python dependencies, list them in a `requirements.txt` file.
