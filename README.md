@@ -1,6 +1,6 @@
 # Study Smart Agent
 
-> **Note:** This project is still under development and is not fully ready yet. Features and documentation may change as development progresses.
+> **Note:** This project was developed as a simple starter project to learn more about Agents and how to build them using a framework like ADK.
 
 3.  **Install dependencies:**
     Use the commands listed below to setup the environment.
